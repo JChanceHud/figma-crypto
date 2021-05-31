@@ -1,0 +1,27 @@
+<h2>Address Creator</h2>
+<form id="address-type">
+  <input type="radio" name="address-type" value="ethereum" />
+  <label for="ethereum">Ethereum</label>
+  <br />
+  <input type="radio" name="address-type" value="zkopru" />
+  <label for="zkopru">ZKOPRU</label>
+  <br />
+  <input type="radio" name="address-type" value="bitcoin" />
+  <label for="zkopru">Bitcoin</label>
+  <br />
+</form>
+<button id="insert">Insert</button>
+<button id="cancel">Cancel</button>
+<script>
+
+document.getElementById('insert').onclick = () => {
+  const addressType = (document.querySelector('input[name="address-type"]:checked') || {}).value
+  console.log(addressType)
+  parent.postMessage({ pluginMessage: { type: 'create-address', addressType }}, '*')
+}
+
+document.getElementById('cancel').onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
+}
+
+</script>
