@@ -1,4 +1,8 @@
 import checksum from 'eth-checksum'
+import * as bitcoin from 'bitcoinjs-lib'
+import createKeccak from 'keccak'
+import base58 from 'bs58'
+
 // This plugin will open a window to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
@@ -15,18 +19,7 @@ figma.showUI(__html__);
 figma.ui.onmessage = async msg => {
   // One way of distinguishing between different types of messages sent from
   // your HTML page is to use an object with a "type" property like this.
-  if (msg.type === 'create-rectangles') {
-    const nodes: SceneNode[] = [];
-    for (let i = 0; i < msg.count; i++) {
-      const rect = figma.createRectangle();
-      rect.x = i * 150;
-      rect.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-      figma.currentPage.appendChild(rect);
-      nodes.push(rect);
-    }
-    figma.currentPage.selection = nodes;
-    figma.viewport.scrollAndZoomIntoView(nodes);
-  } else if (msg.type === 'create-address') {
+  if (msg.type === 'create-address') {
     // make sure we have a text field selected
     for (const node of figma.currentPage.selection) {
       if (node.type === 'TEXT') {
@@ -35,6 +28,10 @@ figma.ui.onmessage = async msg => {
         node.deleteCharacters(0, text.length)
         if (msg.addressType === 'ethereum') {
           node.insertCharacters(0, generateEthAddress())
+        } else if (msg.addressType === 'bitcoin') {
+          node.insertCharacters(0, generateBtcAddress())
+        } else if (msg.addressType === 'zkopru') {
+          node.insertCharacters(0, generateZkopruAddress())
         } else {
           throw new Error(`Unsupported address type: ${msg.addressType}`)
         }
@@ -47,12 +44,38 @@ figma.ui.onmessage = async msg => {
   figma.closePlugin();
 };
 
-function generateEthAddress() {
-  const charset = '0123456789abcdef'
+/**
+ * This is not cryptographically secure
+ **/
+function randomHexString(length: number) {
+  const hexcharset = '0123456789abcdef'
   const chars = [] as string[]
-  for (let x = 0; x < 40; x++) {
-    chars.push(charset[Math.floor(Math.random() * 16)])
+  for (let x = 0; x < length; x++) {
+    chars.push(hexcharset[Math.floor(Math.random() * hexcharset.length)])
   }
-  return checksum.encode(`0x${chars.join('')}`)
-  // return `0x${chars.join('')}`
+  return chars.join('')
+}
+
+function generateEthAddress() {
+  return checksum.encode(`0x${randomHexString(40)}`)
+}
+
+function generateBtcAddress() {
+  // generate an insecure random key
+  const privateKey = randomHexString(64)
+  const keyPair = bitcoin.ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'));
+  const { address } = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
+  return address
+}
+
+function generateZkopruAddress() {
+  // generate a 64 byte payload (128 hex characters)
+  const payload = Buffer.from(randomHexString(128), 'hex')
+  if (payload.length !== 64) throw new Error(`Invalid payload length: ${payload.length}`)
+  const checksum = createKeccak('keccak256')
+    .update(payload)
+    .digest()
+    .slice(0, 4)
+  const address = base58.encode(Buffer.concat([payload, checksum]))
+  return address
 }

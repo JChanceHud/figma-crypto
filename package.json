@@ -1,21 +1,26 @@
 {
-  "name": "crypto",
+  "name": "lorem-ipsum-crypto",
   "version": "1.0.0",
-  "description": "Your Figma plugin",
-  "main": "code.js",
+  "description": "A plugin for generating sample crypto addresses",
+  "main": "build/bundle.js",
   "scripts": {
     "clean": "rm -rf build",
     "build": "npm run clean && tsc -p tsconfig.json && webpack"
   },
-  "author": "",
-  "license": "",
+  "author": "Chance Hudson",
+  "license": "MIT",
   "devDependencies": {
     "@figma/plugin-typings": "^1.23.0",
+    "assert": "^2.0.0",
+    "bitcoinjs-lib": "^5.2.0",
+    "bs58": "^4.0.1",
     "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
     "eth-checksum": "^1.0.1",
-    "ethereum-checksum-address": "0.0.6",
+    "keccak": "^3.0.1",
     "stream-browserify": "^3.0.0",
     "typescript": "^4.3.2",
+    "url": "^0.11.0",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.0"
   }
