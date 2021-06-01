@@ -1,22 +1,28 @@
 <h2>Address Creator</h2>
-<form id="address-type">
-  <input type="radio" name="address-type" value="ethereum" />
-  <label for="ethereum">Ethereum</label>
-  <br />
-  <input type="radio" name="address-type" value="zkopru" />
-  <label for="zkopru">ZKOPRU</label>
-  <br />
-  <input type="radio" name="address-type" value="bitcoin" />
-  <label for="zkopru">Bitcoin</label>
-  <br />
-</form>
-<button id="insert">Insert</button>
-<button id="cancel">Cancel</button>
+<div style="display: flex; flex-direction: column">
+  <button id="ethereum" style="margin-bottom: 8px">
+    Ethereum
+  </button>
+  <button id="zkopru" style="margin-bottom: 8px">
+    Zkopru
+  </button>
+  <button id="bitcoin" style="margin-bottom: 8px">
+    Bitcoin
+  </button>
+  <button id="cancel">Cancel</button>
+</div>
 <script>
 
-document.getElementById('insert').onclick = () => {
-  const addressType = (document.querySelector('input[name="address-type"]:checked') || {}).value
-  parent.postMessage({ pluginMessage: { type: 'create-address', addressType }}, '*')
+document.getElementById('ethereum').onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'create-address', addressType: 'ethereum' }}, '*')
+}
+
+document.getElementById('zkopru').onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'create-address', addressType: 'zkopru' }}, '*')
+}
+
+document.getElementById('bitcoin').onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'create-address', addressType: 'bitcoin' }}, '*')
 }
 
 document.getElementById('cancel').onclick = () => {
