@@ -1,4 +1,8 @@
 <h2>Address Creator</h2>
+<div style="display: flex; align-items: center; margin-bottom: 8px">
+  <input id="same-address" type="checkbox" />
+  <label>Same address for each text node?</label>
+</div>
 <div style="display: flex; flex-direction: column">
   <button id="ethereum" style="margin-bottom: 8px">
     Ethereum
@@ -13,16 +17,20 @@
 </div>
 <script>
 
-document.getElementById('ethereum').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'create-address', addressType: 'ethereum' }}, '*')
-}
+document.getElementById('ethereum').onclick = () => generateAddresses('ethereum')
 
-document.getElementById('zkopru').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'create-address', addressType: 'zkopru' }}, '*')
-}
+document.getElementById('zkopru').onclick = () => generateAddresses('zkopru')
 
-document.getElementById('bitcoin').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'create-address', addressType: 'bitcoin' }}, '*')
+document.getElementById('bitcoin').onclick = () => generateAddresses('bitcoin')
+
+function generateAddresses(type) {
+  parent.postMessage({
+    pluginMessage: {
+      type: 'create-address',
+      addressType: type,
+      singleAddress: document.getElementById('same-address').checked,
+    }
+  }, '*')
 }
 
 document.getElementById('cancel').onclick = () => {

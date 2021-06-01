@@ -21,19 +21,28 @@ figma.ui.onmessage = async msg => {
   // your HTML page is to use an object with a "type" property like this.
   if (msg.type === 'create-address') {
     // make sure we have a text field selected
+    const generateAddress = () => {
+      if (msg.addressType === 'ethereum') {
+        return generateEthAddress()
+      } else if (msg.addressType === 'bitcoin') {
+        return generateBtcAddress()
+      } else if (msg.addressType === 'zkopru') {
+        return generateZkopruAddress()
+      } else {
+        throw new Error(`Unsupported address type: ${msg.addressType}`)
+      }
+    }
+    let address: string
     for (const node of figma.currentPage.selection) {
       if (node.type === 'TEXT') {
         await figma.loadFontAsync(node.fontName as FontName)
         const text = node.characters
         node.deleteCharacters(0, text.length)
-        if (msg.addressType === 'ethereum') {
-          node.insertCharacters(0, generateEthAddress())
-        } else if (msg.addressType === 'bitcoin') {
-          node.insertCharacters(0, generateBtcAddress())
-        } else if (msg.addressType === 'zkopru') {
-          node.insertCharacters(0, generateZkopruAddress())
+        if (msg.singleAddress) {
+          address = address || generateAddress()
+          node.insertCharacters(0, address)
         } else {
-          throw new Error(`Unsupported address type: ${msg.addressType}`)
+          node.insertCharacters(0, generateAddress())
         }
       }
     }
